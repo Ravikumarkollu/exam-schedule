@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MediStudy Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3A7CA5;
+            --primary-light: #5C9EAD;
+            --secondary: #81C3D7;
+            --accent: #FF6B6B;
+            --light: #F0F7FF;
+            --dark: #16425B;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --anatomy: #EF5350;
+            --physiology: #42A5F5;
+            --biochemistry: #66BB6A;
+            --pharmacology: #FFA726;
+            --gray-light: #E1E5E9;
+            --gray: #90A4AE;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #3A7CA5 0%, #16425B 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 15px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .content {
+            padding: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-group {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(58, 124, 165, 0.2);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(58, 124, 165, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(58, 124, 165, 0.3);
+        }
+        
+        .btn-secondary {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 1rem auto;
+        }
+        
+        .btn-secondary:active {
+            transform: translateY(2px);
+            background: var(--light);
+        }
+        
+        .calendar-view {
+            display: none;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            background: linear-gradient(135deg, var(--secondary), #4DA8CA);
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            padding: 0.5rem;
+        }
+        
+        .day-cell {
+            aspect-ratio: 1/1;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            font-weight: 600;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .day-cell:active {
+            transform: scale(0.96);
+        }
+        
+        .day-cell.today {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        
+        .day-cell.completed {
+            background: linear-gradient(135deg, var(--success), #66BB6A);
+            color: white;
+        }
+        
+        .day-number {
+            font-size: 1.3rem; /* Increased font size */
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+        
+        .day-content {
+            text-align: center;
+            font-size: 0.8rem; /* Increased font size */
+            line-height: 1.2;
+            width: 100%;
+        }
+        
+        .subject-name {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+            font-size: 0.75rem; /* Slightly increased */
+        }
+        
+        .unit-badge {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 0.2rem 0.4rem;
+            font-weight: 700;
+            font-size: 0.75rem; /* Slightly increased */
+        }
+        
+        .completed .unit-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .progress-section {
+            margin: 1.5rem 0;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            width: 100%;
+            background: var(--gray-light);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--success), #66BB6A);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.8s ease;
+        }
+        
+        .phase-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .phase {
+            padding: 0.8rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .study-phase {
+            background: linear-gradient(135deg, #42A5F5, #29B6F6);
+            color: white;
+        }
+        
+        .revision-phase {
+            background: linear-gradient(135deg, #FF7043, #FF8A65);
+            color: white;
+        }
+        
+        .empty-cell {
+            aspect-ratio: 1/1;
+            visibility: hidden;
+        }
+        
+        /* Day View Styles */
+        .day-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .day-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        .day-view-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .close-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .time-table {
+            margin-top: 1.5rem;
+        }
+        
+        .time-slot {
+            display: flex;
+            margin-bottom: 1rem;
+            background: var(--light);
+            border-radius: 12px;
+            padding: 1rem;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .time-slot.active {
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            border-left: 4px solid var(--accent);
+            transform: translateX(5px);
+        }
+        
+        .time-range {
+            font-weight: 700;
+            min-width: 120px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .time-range i {
+            font-size: 1.2rem;
+        }
+        
+        .time-description {
+            flex: 1;
+            padding-left: 10px;
+            border-left: 1px solid var(--gray-light);
+            margin-left: 10px;
+        }
+        
+        .time-description h4 {
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .time-description p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .day-view-subject {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .day-view-subject h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .day-view-subject p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .completion-toggle {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, var(--secondary), #4DA8CA);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(129, 195, 215, 0.3);
+        }
+        
+        .completion-toggle:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(129, 195, 215, 0.3);
+        }
+        
+        .time-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: var(--light);
+            border-radius: 12px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .time-indicator i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .study-tips {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #FFF8E1;
+            border-radius: 12px;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .study-tips h4 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .study-tips h4 i {
+            margin-right: 8px;
+            color: var(--warning);
+        }
+        
+        .study-tips p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .day-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        .day-nav-btn {
+            padding: 0.8rem 1.2rem;
+            background: var(--light);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .day-nav-btn:active {
+            transform: translateY(2px);
+            background: var(--gray-light);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                font-size: 15px;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .calendar {
+                gap: 5px;
+            }
+            
+            .day-number {
+                font-size: 1.1rem;
+            }
+            
+            .subject-name {
+                font-size: 0.7rem;
+            }
+            
+            .unit-badge {
+                font-size: 0.7rem;
+            }
+            
+            .time-slot {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .time-range {
+                margin-bottom: 0.5rem;
+            }
+            
+            .time-description {
+                border-left: none;
+                border-top: 1px solid var(--gray-light);
+                margin-left: 0;
+                margin-top: 10px;
+                padding-left: 0;
+                padding-top: 10px;
+                width: 100%;
+            }
+            
+            .phase {
+                min-width: 100%;
+                margin: 0 0 10px 0;
+            }
+        }
+        
+        /* Reschedule modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-align: center;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .modal-btn.cancel {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+        
+        .modal-btn.confirm {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1><i class="fas fa-heartbeat"></i> MediStudy Planner</h1>
+            <p>Plan your medical exam preparation day by day</p>
+        </div>
+        
+        <div class="content">
+            <div id="setup">
+                <div class="card">
+                    <p style="text-align: center; margin-bottom: 1.2rem; color: var(--dark);">
+                        Enter your four medical subjects. You'll study <strong>one subject per day</strong> in sequence.
+                    </p>
+                    
+                    <div class="input-group">
+                        <label for="subject1"><i class="fas fa-lungs" style="color: var(--anatomy);"></i> Subject 1</label>
+                        <input type="text" id="subject1" placeholder="e.g., Anatomy" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="subject2"><i class="fas fa-brain" style="color: var(--physiology);"></i> Subject 2</label>
+                        <input type="text" id="subject2" placeholder="e.g., Physiology" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="subject3"><i class="fas fa-vial" style="color: var(--biochemistry);"></i> Subject 3</label>
+                        <input type="text" id="subject3" placeholder="e.g., Biochemistry" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="subject4"><i class="fas fa-pills" style="color: var(--pharmacology);"></i> Subject 4</label>
+                        <input type="text" id="subject4" placeholder="e.g., Pharmacology" required>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="generatePlan()">
+                        <i class="fas fa-stethoscope"></i> Generate Study Plan
+                    </button>
+                </div>
+            </div>
+            
+            <div id="calendar-view" class="calendar-view">
+                <div class="calendar-header">
+                    <span>September</span>
+                    <span>October</span>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Your Progress</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="calendar-weekdays">
+                    <div class="calendar" style="grid-template-columns: repeat(7, 1fr); margin-bottom: 0.5rem;">
+                    
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                        <div class="weekday">Sun</div>
+                    </div>
+                </div>
+                
+                <div class="calendar" id="calendar"></div>
+                
+                <div class="phase-indicators">
+                    <div class="phase study-phase">
+                        Study Phase<br>Sep 15 - Oct 4
+                    </div>
+                    <div class="phase revision-phase">
+                        Revision Phase<br>Oct 5 - Oct 7
+                    </div>
+                </div>
+                
+                <button class="btn-secondary" onclick="showRescheduleModal()">
+                    <i class="fas fa-calendar-alt"></i> Reschedule Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day View -->
+    <div id="day-view" class="day-view">
+        <div class="day-view-header">
+            <h2 class="day-view-title" id="day-view-date">September 15, 2024</h2>
+            <button class="close-btn" onclick="closeDayView()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="day-view-content">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="modal-overlay" id="reschedule-modal">
+        <div class="modal">
+            <h3><i class="fas fa-calendar-alt"></i> Reschedule Plan</h3>
+            <p>Are you sure you want to reschedule your study plan? This will reset your progress and generate a new plan starting from today.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="hideRescheduleModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="reschedulePlan()">Reschedule</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const subjectColors = [ '#EF5350', '#42A5F5', '#66BB6A', '#FFA726' ];
+        let studyPlan = [];
+        let today = new Date();
+        today.setHours(0,0,0,0);
+        let subjects = [];
+        let currentDayView = null;
+        let currentDayIndex = 0;
+
+        // Initialize the app
+        function initApp() {
+            // Try to load from localStorage
+            const savedPlan = localStorage.getItem('studyPlan');
+            const savedSubjects = localStorage.getItem('subjects');
+            
+            if (savedPlan && savedSubjects) {
+                try {
+                    studyPlan = JSON.parse(savedPlan);
+                    // Convert date strings back to Date objects
+                    studyPlan = studyPlan.map(day => {
+                        return {
+                            ...day,
+                            date: new Date(day.date)
+                        };
+                    });
+                    
+                    subjects = JSON.parse(savedSubjects);
+                    
+                    // Pre-fill subject inputs
+                    document.getElementById('subject1').value = subjects[0] || '';
+                    document.getElementById('subject2').value = subjects[1] || '';
+                    document.getElementById('subject3').value = subjects[2] || '';
+                    document.getElementById('subject4').value = subjects[3] || '';
+                    
+                    // Show calendar view
+                    document.getElementById('setup').style.display = 'none';
+                    document.getElementById('calendar-view').style.display = 'block';
+                    
+                    renderCalendar();
+                } catch (e) {
+                    console.error("Error loading saved data:", e);
+                    // Clear invalid data
+                    localStorage.removeItem('studyPlan');
+                    localStorage.removeItem('subjects');
+                }
+            }
+        }
+
+        function generatePlan() {
+            subjects = [
+                document.getElementById('subject1').value,
+                document.getElementById('subject2').value,
+                document.getElementById('subject3').value,
+                document.getElementById('subject4').value
+            ];
+
+            if (subjects.some(subject => subject === '')) {
+                alert('Please name all your medical subjects!');
+                return;
+            }
+
+            document.getElementById('setup').style.display = 'none';
+            document.getElementById('calendar-view').style.display = 'block';
+
+            generateStudyPlan(subjects);
+            renderCalendar();
+            
+            // Save to localStorage
+            saveToLocalStorage();
+        }
+
+        function generateStudyPlan(subjects) {
+            studyPlan = [];
+            const startDate = new Date('2024-09-15');
+            const revisionStartDate = new Date('2024-10-05');
+            const endDate = new Date('2024-10-07');
+            
+            let currentDate = new Date(startDate);
+            let dayCounter = 0;
+
+            while (currentDate <= endDate) {
+                const isStudyPhase = currentDate < revisionStartDate;
+                const dayInfo = {
+                    date: new Date(currentDate),
+                    subject: '',
+                    unit: 0,
+                    completed: false
+                };
+
+                if (isStudyPhase) {
+                    // Calculate which subject and unit for this day
+                    const subjectIndex = dayCounter % 4; // Cycle through 0-3 for subjects
+                    const unitNumber = Math.floor(dayCounter / 4) + 1; // Calculate unit number
+                    
+                    if (unitNumber <= 5) { // Only add if we have units left
+                        dayInfo.subject = subjects[subjectIndex];
+                        dayInfo.unit = unitNumber;
+                        dayInfo.color = subjectColors[subjectIndex];
+                    }
+                }
+
+                studyPlan.push(dayInfo);
+                currentDate.setDate(currentDate.getDate() + 1);
+                dayCounter++;
+            }
+        }
+
+        function renderCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            calendarEl.innerHTML = '';
+
+            const startDate = new Date('2024-09-15');
+            const firstDay = startDate.getDay();
+
+            // Add empty cells for days before Sep 15
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'empty-cell';
+                calendarEl.appendChild(emptyCell);
+            }
+
+            // Render each day
+            studyPlan.forEach((day, index) => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day-cell';
+                
+                if (day.date.getTime() === today.getTime()) {
+                    dayEl.classList.add('today');
+                }
+                
+                if (day.completed) {
+                    dayEl.classList.add('completed');
+                }
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day.date.getDate();
+                dayEl.appendChild(dayNumber);
+
+                if (day.subject) {
+                    const dayContent = document.createElement('div');
+                    dayContent.className = 'day-content';
+                    
+                    const subjectName = document.createElement('div');
+                    subjectName.className = 'subject-name';
+                    subjectName.textContent = day.subject;
+                    subjectName.style.color = day.color;
+                    dayContent.appendChild(subjectName);
+                    
+                    const unitBadge = document.createElement('div');
+                    unitBadge.className = 'unit-badge';
+                    unitBadge.textContent = `Unit ${day.unit}`;
+                    unitBadge.style.color = day.color;
+                    dayContent.appendChild(unitBadge);
+                    
+                    dayEl.appendChild(dayContent);
+                }
+
+                dayEl.onclick = () => {
+                    currentDayIndex = index;
+                    openDayView(day, index);
+                };
+                calendarEl.appendChild(dayEl);
+            });
+
+            updateProgress();
+        }
+
+        function openDayView(day, index) {
+            currentDayView = day;
+            currentDayIndex = index;
+            const dayView = document.getElementById('day-view');
+            const dayViewDate = document.getElementById('day-view-date');
+            const dayViewContent = document.getElementById('day-view-content');
+            
+            // Format date
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            dayViewDate.textContent = day.date.toLocaleDateString('en-US', options);
+            
+            // Clear previous content
+            dayViewContent.innerHTML = '';
+            
+            if (day.subject) {
+                // Add subject info
+                const subjectEl = document.createElement('div');
+                subjectEl.className = 'day-view-subject';
+                subjectEl.innerHTML = `
+                    <h3>${day.subject}</h3>
+                    <p>Unit ${day.unit} • ${getStudyTips(day.subject)}</p>
+                `;
+                subjectEl.style.background = `linear-gradient(135deg, ${day.color}, ${adjustColor(day.color, 20)})`;
+                dayViewContent.appendChild(subjectEl);
+                
+                // Add current time indicator
+                const currentTime = new Date();
+                const currentHours = currentTime.getHours();
+                const currentMinutes = currentTime.getMinutes();
+                const currentTimeString = `${currentHours.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
+                
+                const timeIndicator = document.createElement('div');
+                timeIndicator.className = 'time-indicator';
+                timeIndicator.innerHTML = `
+                    <i class="fas fa-clock"></i> Current time: ${currentTimeString}
+                `;
+                dayViewContent.appendChild(timeIndicator);
+                
+                // Add time table based on day of week
+                const timeTable = document.createElement('div');
+                timeTable.className = 'time-table';
+                
+                if (day.date.getDay() === 0) { // Sunday
+                    timeTable.innerHTML = `
+                        <div class="time-slot ${isTimeActive(5, 0, 8, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-sun"></i> 5:00 AM - 8:00 AM</div>
+                            <div class="time-description">
+                                <h4>Study Session 1</h4>
+                                <p>Focus on understanding complex medical concepts</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(8, 0, 16, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-utensils"></i> 8:00 AM - 4:00 PM</div>
+                            <div class="time-description">
+                                <h4>Break / Clinical Practice</h4>
+                                <p>Meals, rest, and practical clinical activities</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(16, 0, 19, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-moon"></i> 4:00 PM - 7:00 PM</div>
+                            <div class="time-description">
+                                <h4>Study Session 2</h4>
+                                <p>Practice clinical cases and review</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(19, 0, 24, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-bed"></i> 7:00 PM onwards</div>
+                            <div class="time-description">
+                                <h4>Rest & Relaxation</h4>
+                                <p>Wind down and prepare for sleep</p>
+                            </div>
+                        </div>
+                    `;
+                } else { // Weekday
+                    timeTable.innerHTML = `
+                        <div class="time-slot ${isTimeActive(5, 0, 6, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-sun"></i> 5:00 AM - 6:00 AM</div>
+                            <div class="time-description">
+                                <h4>Morning Study Session</h4>
+                                <p>Review previous day's medical concepts</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(6, 0, 19, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-hospital"></i> 6:00 AM - 7:00 PM</div>
+                            <div class="time-description">
+                                <h4>Medical School / Clinicals</h4>
+                                <p>Regular medical school schedule and clinical rotations</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(19, 0, 20, 30) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-book-medical"></i> 7:00 PM - 8:30 PM</div>
+                            <div class="time-description">
+                                <h4>Evening Study Session</h4>
+                                <p>Focus on new medical concepts and case studies</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(21, 0, 21, 30) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-sync-alt"></i> 9:00 PM - 9:30 PM</div>
+                            <div class="time-description">
+                                <h4>Quick Revision</h4>
+                                <p>Review key medical points from the day</p>
+                            </div>
+                        </div>
+                        <div class="time-slot ${isTimeActive(21, 30, 24, 0) ? 'active' : ''}">
+                            <div class="time-range"><i class="fas fa-bed"></i> 9:30 PM onwards</div>
+                            <div class="time-description">
+                                <h4>Rest & Relaxation</h4>
+                                <p>Wind down and prepare for sleep</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                dayViewContent.appendChild(timeTable);
+                
+                // Add study tips
+                const studyTips = document.createElement('div');
+                studyTips.className = 'study-tips';
+                studyTips.innerHTML = `
+                    <h4><i class="fas fa-lightbulb"></i> Study Tips for ${day.subject}</h4>
+                    <p>${getStudyTips(day.subject)}</p>
+                `;
+                dayViewContent.appendChild(studyTips);
+                
+                // Add completion toggle button
+                const toggleButton = document.createElement('button');
+                toggleButton.className = 'completion-toggle';
+                toggleButton.innerHTML = day.completed ? 
+                    '<i class="fas fa-undo"></i> Mark as Incomplete' : 
+                    '<i class="fas fa-check"></i> Mark as Completed';
+                toggleButton.onclick = () => toggleDayCompletionFromView(day);
+                dayViewContent.appendChild(toggleButton);
+                
+                // Add navigation buttons
+                const dayNav = document.createElement('div');
+                dayNav.className = 'day-nav';
+                
+                if (currentDayIndex > 0) {
+                    const prevButton = document.createElement('button');
+                    prevButton.className = 'day-nav-btn';
+                    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous Day';
+                    prevButton.onclick = () => navigateToDay(currentDayIndex - 1);
+                    dayNav.appendChild(prevButton);
+                } else {
+                    dayNav.appendChild(document.createElement('div')); // Empty div for spacing
+                }
+                
+                if (currentDayIndex < studyPlan.length - 1) {
+                    const nextButton = document.createElement('button');
+                    nextButton.className = 'day-nav-btn';
+                    nextButton.innerHTML = 'Next Day <i class="fas fa-chevron-right"></i>';
+                    nextButton.onclick = () => navigateToDay(currentDayIndex + 1);
+                    dayNav.appendChild(nextButton);
+                } else {
+                    dayNav.appendChild(document.createElement('div')); // Empty div for spacing
+                }
+                
+                dayViewContent.appendChild(dayNav);
+            } else {
+                // No study planned for this day
+                dayViewContent.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-heartbeat" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <h3>No Study Planned</h3>
+                        <p>This is a rest day or revision day with no specific unit scheduled.</p>
+                        <div class="day-nav" style="justify-content: center; margin-top: 1.5rem;">
+                            ${currentDayIndex > 0 ? `<button class="day-nav-btn" onclick="navigateToDay(${currentDayIndex - 1})"><i class="fas fa-chevron-left"></i> Previous Day</button>` : ''}
+                            ${currentDayIndex < studyPlan.length - 1 ? `<button class="day-nav-btn" onclick="navigateToDay(${currentDayIndex + 1})">Next Day <i class="fas fa-chevron-right"></i></button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Show the day view
+            dayView.style.display = 'block';
+        }
+
+        function navigateToDay(index) {
+            if (index >= 0 && index < studyPlan.length) {
+                currentDayIndex = index;
+                openDayView(studyPlan[index], index);
+            }
+        }
+
+        function isTimeActive(startHour, startMin, endHour, endMin) {
+            const now = new Date();
+            const currentHours = now.getHours();
+            const currentMinutes = now.getMinutes();
+            
+            const startTime = startHour * 60 + startMin;
+            const endTime = endHour * 60 + endMin;
+            const currentTime = currentHours * 60 + currentMinutes;
+            
+            return currentTime >= startTime && currentTime <= endTime;
+        }
+
+        function getStudyTips(subject) {
+            const tips = {
+                'Anatomy': 'Use anatomical models and diagrams to visualize structures. Focus on spatial relationships.',
+                'Physiology': 'Understand mechanisms rather than memorizing. Create flowcharts for physiological processes.',
+                'Biochemistry': 'Focus on metabolic pathways and their regulation. Use mnemonics for complex processes.',
+                'Pharmacology': 'Group drugs by class and mechanism of action. Understand therapeutic uses and side effects.',
+                'Pathology': 'Correlate morphological changes with clinical manifestations. Use visual aids for better retention.',
+                'Microbiology': 'Focus on characteristic features of organisms and associated diseases. Use tables for comparison.',
+                'Medicine': 'Understand pathophysiology of diseases. Focus on diagnostic approach and management principles.'
+            };
+            
+            return tips[subject] || 'Break your study time into focused 45-50 minute sessions with 10-minute breaks. Use active recall and spaced repetition for better retention.';
+        }
+
+        function closeDayView() {
+            document.getElementById('day-view').style.display = 'none';
+            currentDayView = null;
+        }
+
+        function toggleDayCompletionFromView(day) {
+            if (!day.subject) return; // Don't allow marking empty days
+            
+            day.completed = !day.completed;
+            
+            // Update localStorage
+            saveToLocalStorage();
+            
+            // Close the day view and refresh calendar
+            closeDayView();
+            renderCalendar();
+        }
+
+        function toggleDayCompletion(day, dayEl) {
+            if (!day.subject) return; // Don't allow marking empty days
+            
+            day.completed = !day.completed;
+            dayEl.classList.toggle('completed');
+            updateProgress();
+            
+            // Save to localStorage
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('studyPlan', JSON.stringify(studyPlan));
+            localStorage.setItem('subjects', JSON.stringify(subjects));
+        }
+
+        function updateProgress() {
+            const totalDays = studyPlan.filter(day => day.subject).length;
+            const completedDays = studyPlan.filter(day => day.completed).length;
+            const progressPercent = totalDays > 0 ? (completedDays / totalDays) * 100 : 0;
+            
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+            document.getElementById('progress-percent').textContent = Math.round(progressPercent) + '%';
+        }
+        
+        // Helper function to adjust color brightness
+        function adjustColor(color, percent) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const R = (num >> 16) + percent;
+            const G = ((num >> 8) & 0x00FF) + percent;
+            const B = (num & 0x0000FF) + percent;
+            
+            return '#' + (
+                0x1000000 +
+                (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
+                (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
+                (B < 255 ? (B < 0 ? 0 : B) : 255)
+            ).toString(16).slice(1);
+        }
+        
+        // Reschedule functions
+        function showRescheduleModal() {
+            document.getElementById('reschedule-modal').style.display = 'flex';
+        }
+        
+        function hideRescheduleModal() {
+            document.getElementById('reschedule-modal').style.display = 'none';
+        }
+        
+        function reschedulePlan() {
+            // Reset the plan and show setup again
+            studyPlan = [];
+            subjects = [];
+            localStorage.removeItem('studyPlan');
+            localStorage.removeItem('subjects');
+            
+            document.getElementById('calendar-view').style.display = 'none';
+            document.getElementById('setup').style.display = 'block';
+            
+            hideRescheduleModal();
+        }
+
+        // Initialize the app when the page loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>
